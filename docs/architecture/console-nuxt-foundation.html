@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Console Nuxt · Fundação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1C1917; --panel:#221E1B; --panel2:#282320; --line:#3A332E;
+  --ink:#F5F1ED; --body:#C9C0B8; --mut:#8E8378; --faint:#6B615A;
+  --acc:#E8734A; --acc-dim:#8A4028; --acc-bg:#2E211B;
+  --grn:#5BBF8A; --grn-bg:#1C2A22; --grn-line:#2F5A44;
+  --red:#E8654A; --red-bg:#2E1E1A; --red-line:#5C332A;
+  --vio:#9B87D4; --vio-bg:#241F2E; --vio-line:#463A63;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:20px}
+body{margin:0; background:var(--bg); color:var(--body);
+  font-family:'Inter',-apple-system,'Segoe UI',sans-serif; font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased}
+.page{max-width:1080px; margin:0 auto; padding:60px 28px 140px}
+
+/* ---------- topo ---------- */
+.masthead{border-bottom:1px solid var(--line); padding-bottom:32px; margin-bottom:12px}
+.kicker{font:600 11px/1 var(--mono); letter-spacing:.18em; color:var(--acc);
+  text-transform:uppercase}
+h1{font-size:clamp(28px,4vw,42px); line-height:1.1; letter-spacing:-.02em; font-weight:700;
+  color:var(--ink); margin:18px 0 14px; max-width:26ch}
+.dek{font-size:17px; color:var(--mut); max-width:66ch; margin:0}
+.meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
+.pill{font:500 11.5px/1 var(--mono); padding:7px 11px; border:1px solid var(--line);
+  border-radius:5px; color:var(--mut)}
+.pill b{color:var(--ink); font-weight:600}
+.pill.on{border-color:var(--acc-dim); color:var(--acc); background:var(--acc-bg)}
+
+/* ---------- secoes ---------- */
+section{padding-top:64px}
+h2{display:flex; align-items:baseline; gap:14px; font-size:23px; line-height:1.25;
+  letter-spacing:-.01em; font-weight:650; color:var(--ink); margin:0 0 20px;
+  padding-bottom:16px; border-bottom:1px solid var(--line)}
+h2 .n{font:700 12px/1 var(--mono); color:var(--acc); flex:none; padding-top:5px}
+h3{font-size:16px; font-weight:650; color:var(--ink); margin:36px 0 12px}
+p{max-width:74ch; margin:12px 0}
+strong{color:var(--ink); font-weight:600}
+code{font-family:var(--mono); font-size:.9em; color:var(--acc);
+  background:var(--acc-bg); padding:2px 5px; border-radius:3px}
+
+/* ---------- diagrama: moldura ---------- */
+.dia{background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:24px; margin:26px 0 10px}
+.dia-cap{font-size:13.5px; color:var(--mut); margin:0 0 26px; max-width:none}
+.dia-cap b{color:var(--ink)}
+.frame{border:1px solid var(--line); border-radius:8px; padding:18px; margin:14px 0;
+  position:relative}
+.frame.acc{border-color:var(--acc-dim)}
+.frame.grn{border-color:var(--grn-line)}
+.frame.vio{border-color:var(--vio-line); border-style:dashed}
+.frame.red{border-color:var(--red-line)}
+.frame > .tag{font:600 10.5px/1 var(--mono); letter-spacing:.13em; text-transform:uppercase;
+  color:var(--mut); display:block; margin-bottom:14px}
+.frame.acc > .tag{color:var(--acc)}
+.frame.grn > .tag{color:var(--grn)}
+.frame.vio > .tag{color:var(--vio)}
+.frame.red > .tag{color:var(--red)}
+
+/* ---------- grades de caixas ---------- */
+.grid{display:grid; gap:12px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+.node{background:var(--panel2); border:1px solid var(--line); border-radius:7px;
+  padding:13px 14px}
+.node > b{display:block; font-family:var(--mono); font-size:12.5px; color:var(--ink);
+  font-weight:600; margin-bottom:5px}
+.node span{display:block; font-size:12px; color:var(--mut); line-height:1.5}
+.node.hot{border-color:var(--acc); background:var(--acc-bg)}
+.node.hot b{color:var(--acc)}
+.node.ok{border-color:var(--grn-line); background:var(--grn-bg)}
+.node.ok b{color:var(--grn)}
+.node.vio{border-color:var(--vio-line); background:var(--vio-bg)}
+.node.vio b{color:var(--vio)}
+.node.bad{border-color:var(--red-line); background:var(--red-bg)}
+.node.bad b{color:var(--red)}
+
+/* ---------- fluxo vertical ---------- */
+.flow{display:flex; flex-direction:column; gap:0}
+.step{background:var(--panel2); border:1px solid var(--line); border-radius:7px;
+  padding:12px 15px}
+.step.hot{border-color:var(--acc); background:var(--acc-bg)}
+.step.ok{border-color:var(--grn-line); background:var(--grn-bg)}
+.step > b{display:block; font-size:13.5px; color:var(--ink); font-weight:600; margin-bottom:4px}
+.step > b i{font-style:normal; font-family:var(--mono); font-size:11.5px; color:var(--acc);
+  margin-right:8px}
+.step span{display:block; font-size:12.5px; color:var(--mut); line-height:1.55}
+.step span b, .node span b{display:inline; font-weight:600; color:var(--ink);
+  font-family:var(--mono); font-size:.96em}
+.step ol{margin:8px 0 0; padding-left:20px; font-size:12.5px; color:var(--mut)}
+.arr{height:18px; position:relative}
+.arr::before{content:''; position:absolute; left:50%; top:0; bottom:5px; width:1px;
+  background:var(--acc-dim)}
+.arr::after{content:''; position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+  border:4px solid transparent; border-top-color:var(--acc)}
+
+/* ---------- tabelas ---------- */
+.tw{overflow-x:auto; margin:22px 0; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:560px}
+th{text-align:left; font:600 10.5px/1 var(--mono); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--mut); padding:12px 14px; border-bottom:1px solid var(--line);
+  background:var(--panel2); white-space:nowrap}
+td{padding:11px 14px; border-bottom:1px solid var(--line); color:var(--body);
+  vertical-align:top}
+tr:last-child td{border-bottom:0}
+td:first-child{color:var(--ink); font-weight:550}
+td.m{font-family:var(--mono); font-size:12px}
+
+/* ---------- callouts ---------- */
+.note{border-left:2px solid var(--acc); background:var(--acc-bg); padding:14px 18px;
+  border-radius:0 7px 7px 0; margin:22px 0}
+.note.g{border-color:var(--grn); background:var(--grn-bg)}
+.note.r{border-color:var(--red); background:var(--red-bg)}
+.note .lb{font:600 10.5px/1 var(--mono); letter-spacing:.13em; text-transform:uppercase;
+  color:var(--acc); display:block; margin-bottom:7px}
+.note.g .lb{color:var(--grn)} .note.r .lb{color:var(--red)}
+.note p{margin:0; font-size:14px; max-width:none}
+
+/* ---------- listas ---------- */
+ul.tick{list-style:none; padding:0; margin:10px 0}
+ul.tick li{position:relative; padding-left:18px; margin:7px 0; font-size:13.5px}
+ul.tick li::before{content:''; position:absolute; left:2px; top:.62em; width:5px; height:5px;
+  border-radius:50%; background:var(--acc)}
+ul.tick.g li::before{background:var(--grn)}
+ul.tick.r li::before{background:var(--red)}
+
+/* ---------- arvore ---------- */
+pre.tree{font-family:var(--mono); font-size:12px; line-height:1.75; color:var(--body);
+  background:var(--panel); border:1px solid var(--line); border-radius:8px;
+  padding:20px; overflow-x:auto; margin:22px 0}
+pre.tree i{color:var(--mut); font-style:normal}
+pre.tree b{color:var(--acc); font-weight:500}
+pre.tree u{color:var(--grn); text-decoration:none}
+
+/* ---------- rodape ---------- */
+footer{margin-top:80px; padding-top:26px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--faint); font-family:var(--mono); line-height:1.9}
+footer b{color:var(--mut); font-weight:500}
+
+@media(max-width:820px){
+  .g3,.g4{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .page{padding:38px 18px 90px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style></head>
+<body><div class="page">
+
+<header class="masthead">
+  <p class="kicker">Console Nuxt · spec console-nuxt-foundation</p>
+  <h1>A fundação do novo Console</h1>
+  <p class="dek">O novo Design System exige reconstruir a apresentação de todo o Console. É a
+    janela para corrigir a causa raiz: o projeto atual não foi desenhado para manutenibilidade,
+    performance nem segurança. Quatro andares, duas decisões centrais, e fronteiras que o lint
+    e os testes verificam a cada build.</p>
+  <div class="meta">
+    <span class="pill"><b>72</b> critérios de aceitação</span>
+    <span class="pill"><b>12</b> decisões registradas</span>
+    <span class="pill"><b>12</b> invariantes com teste</span>
+    <span class="pill on"><b>Nuxt</b> · SSR na edge</span>
+  </div>
+</header>
+
+<!-- ============================================================ 01 -->
+<section id="s1">
+  <h2><span class="n">01</span> As camadas da aplicação — o big picture</h2>
+  <p>A aplicação tem quatro andares. No topo, o <strong>domínio</strong>: uma pasta por seção
+    do Console. Abaixo, o módulo <code>core</code>, que entrega todas as capacidades
+    compartilhadas. Depois a <strong>fundação</strong> (design system, cache, servidor) e, na
+    base, as <strong>APIs</strong>. A regra que sustenta o desenho: a dependência só aponta
+    para baixo.</p>
+
+  <div class="dia">
+    <div class="frame grn"><span class="tag">app/resources/ — domínio</span>
+      <div class="grid g3">
+        <div class="node ok"><b>network-lists/</b><span>resource de referência</span></div>
+        <div class="node"><b>applications/</b><span>próximos resources</span></div>
+        <div class="node"><b>editor · schema</b><span>adapters por versão de API</span></div>
+      </div>
+    </div>
+    <div class="frame vio"><span class="tag">app/versioning/</span>
+      <div class="grid g3">
+        <div class="node vio"><b>VersionShell.vue</b><span>a casca do modo versionado</span></div>
+        <div class="node vio"><b>machine.ts</b><span>a matriz de estados — módulo puro</span></div>
+        <div class="node vio"><b>components/</b><span>barra de ações, diálogos, badge de estado</span></div>
+      </div>
+    </div>
+    <div class="frame acc"><span class="tag">app/core/ — capacidades compartilhadas</span>
+      <div class="grid g4">
+        <div class="node"><b>AppShell</b><span>moldura das telas de navegação</span></div>
+        <div class="node"><b>ResourceContext</b><span>contrato provido pela Shell</span></div>
+        <div class="node hot"><b>ShellResolver</b><span>aplica resolveMode() e monta a Shell</span></div>
+        <div class="node"><b>DefaultShell</b><span>editar e salvar direto</span></div>
+        <div class="node"><b>contratos tipados</b><span>a fachada que todos seguem</span></div>
+        <div class="node"><b>ResourceService</b><span>classe base dos serviços</span></div>
+        <div class="node"><b>apiFetch + ApiError</b><span>o único cliente HTTP</span></div>
+        <div class="node"><b>TanStack Query</b><span>cache e hidratação SSR</span></div>
+        <div class="node hot"><b>AuthStrategy</b><span>três modos por constante</span></div>
+        <div class="node"><b>guards de rota</b><span>identidade e proteção de rota</span></div>
+        <div class="node"><b>constantes de config</b><span>todo default num só lugar</span></div>
+        <div class="node"><b>resolveMode</b><span>função pura: decide o modo</span></div>
+      </div>
+    </div>
+    <div class="arr"></div>
+    <div class="frame"><span class="tag">fundação</span>
+      <div class="grid g3">
+        <div class="node"><b>@aziontech/webkit</b><span>design system novo · catálogo por MCP</span></div>
+        <div class="node"><b>TanStack Query</b><span>cache, deduplicação e hidratação</span></div>
+        <div class="node"><b>Nitro</b><span>SSR e server routes na Azion Edge</span></div>
+      </div>
+    </div>
+    <div class="arr"></div>
+    <div class="frame"><span class="tag">externo</span>
+      <div class="grid g2">
+        <div class="node"><b>API da plataforma</b><span>v3, v4 e v6</span></div>
+        <div class="node"><b>API de autenticação</b><span>SSO</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="dia-cap"><b>Figura 1.</b> As duas caixas em laranja são onde moram as decisões
+    centrais: o <b>ShellResolver</b> escolhe qual tela montar, e a <b>AuthStrategy</b> define
+    onde a credencial é colocada na requisição. O módulo
+    passam a ter um único lugar, em vez de serem re-decididas por feature. O módulo
+    <code>app/versioning/</code> não traz uma caixa de “contratos” porque isso é propriedade,
+    não artefato — a regra estrutural abaixo já garante que ele pluga sem tocar o core.</p>
+
+  <div class="note r"><span class="lb">Regra estrutural</span>
+    <p>A dependência só aponta para baixo. O core nunca importa domínio — o lint quebra o build
+      se isso acontecer.</p></div>
+</section>
+
+<!-- ============================================================ 02 -->
+<section id="s2">
+  <h2><span class="n">02</span> O ciclo de um request — onde a Shell é decidida</h2>
+  <p>Este fluxo substitui a cadeia de oito guards do console-kit. O ponto crítico é o passo 6:
+    a mesma URL pode servir a tela default ou a versionada, e a escolha é feita no servidor,
+    a cada request, com o contexto fresco da conta.</p>
+
+  <div class="dia">
+    <div class="step"><b><i>1</i>GET /applications/edit/123</b>
+      <span>o browser envia o cookie de sessão junto</span></div>
+    <div class="arr"></div>
+    <div class="frame acc"><span class="tag">Nitro na Azion Edge — executa no servidor, uma vez por request</span>
+      <div class="flow">
+        <div class="step"><b><i>2</i>Plugins de servidor</b>
+          <span>o tema vem do cookie e já é aplicado no HTML; preconnect das fontes</span></div>
+        <div class="arr"></div>
+        <div class="step hot"><b><i>3</i>O <b>AppContext</b> é composto</b>
+          <ol><li>o transporte de credencial resolve a identidade a partir das claims do JWT</li>
+              <li>o provider OpenFeature avalia as flags com esse contexto</li>
+              <li>o tema vem do cookie</li></ol>
+          <span>uma composição, provida pela AppShell — refeita na troca de conta, não a cada navegação</span></div>
+        <div class="arr"></div>
+        <div class="step"><b><i>4</i>O guard auth.global verifica a identidade</b>
+          <span>sem identidade, redireciona ao login guardando a rota de retorno</span></div>
+        <div class="arr"></div>
+        <div class="step"><b><i>5</i>A rota estável monta o ShellResolver</b>
+          <span>rota canônica do resource, a mesma nos dois modos</span></div>
+        <div class="arr"></div>
+        <div class="step hot"><b><i>6</i>resolveMode() devolve o modo e o motivo</b>
+          <ol><li>o resource declara que suporta versões</li>
+              <li>a feature flag está ligada para a conta</li>
+              <li>o usuário tem permissão para o modo versionado</li>
+              <li>a API oferece a capability necessária</li></ol></div>
+        <div class="arr"></div>
+        <div class="grid g2">
+          <div class="node"><b>DefaultShell</b>
+            <span>modo default — versionamento desligado, sem suporte ou sem permissão</span></div>
+          <div class="node vio"><b>VersionShell</b>
+            <span>modo versioned — versionamento ligado para a conta</span></div>
+        </div>
+        <div class="arr"></div>
+        <div class="step"><b><i>7</i>HTML pronto, com o estado da sessão embutido</b>
+          <span>nada precisa ser buscado de novo no cliente</span></div>
+      </div>
+    </div>
+    <div class="arr"></div>
+    <div class="step ok"><b><i>8</i>O browser hidrata</b>
+      <span>mesma Shell e mesmo tema que o servidor pintou — sem flash de tema, sem
+        divergência de hidratação, sem buscar dados de novo</span></div>
+  </div>
+  <p class="dia-cap"><b>Figura 2.</b> Os passos 2 a 7 rodam no servidor, uma vez por request.
+    O AppContext do passo 3 é a fonte única de sessão, permissões e feature flags — no
+    console-kit atual essa informação tem duas fontes de verdade que se dessincronizam, e a
+    rota chega a discordar do menu.</p>
+
+  <div class="grid g2">
+    <div class="note g"><span class="lb">Por que isso importa</span>
+      <p>Nas navegações seguintes dentro do app, o mesmo <code>resolveMode()</code> roda no
+        browser com o contexto já hidratado. Trocar de conta gera um contexto novo e uma
+        decisão nova, sem recarregar a página.</p></div>
+    <div class="note r"><span class="lb">No console-kit atual</span>
+      <p>Essa escolha é um ternário dentro do import da rota, avaliado uma única vez por
+        sessão: trocar de conta mantém a tela errada até recarregar a página.</p></div>
+  </div>
+
+  <h3>Os dois modos são escolha do cliente, não estágios de migração</h3>
+  <p>O que o passo 6 decide é qual modo de operação está ativo para aquele cliente — e essa é
+    uma escolha permanente e reversível, não uma etapa de rollout.</p>
+  <div class="grid g2">
+    <div class="frame vio"><span class="tag">versionamento habilitado → VersionShell</span>
+      <p style="font-size:13.5px">O cliente trabalha com versões, estados, build e deploy.
+        Salvar grava um rascunho, que só passa a valer depois de publicado.</p>
+      <p style="font-size:12.5px;color:var(--faint)">Exige V6 — versionamento só existe nessa
+        versão da plataforma.</p></div>
+    <div class="frame"><span class="tag">versionamento desabilitado → DefaultShell</span>
+      <p style="font-size:13.5px">Persistência direta: editar, validar e salvar. A configuração
+        salva passa a ser efetiva sem build nem deploy.</p>
+      <p style="font-size:12.5px;color:var(--faint)">Modo permanente e suportado, não estado
+        legado.</p></div>
+  </div>
+  <div class="note"><span class="lb">O que decorre disso</span>
+    <p>A DefaultShell recebe o mesmo investimento e cobertura de testes que a VersionShell. E,
+      como o cliente pode alternar nos dois sentidos, a troca de modo durante a sessão é um
+      fluxo real: com alterações pendentes ou operação assíncrona em andamento, a troca
+      automática é bloqueada e o usuário decide — e um rascunho versionado <strong>nunca</strong>
+      vira salvamento direto silenciosamente.</p></div>
+</section>
+
+<!-- ============================================================ 03 -->
+<section id="s3">
+  <h2><span class="n">03</span> Credencial — três modos, um por constante</h2>
+  <p>O Console atual não tem três formas alternativas de autenticar: tem <strong>três mecanismos que
+    coexistem</strong>, e a combinação é decidida em tempo de build.</p>
+
+  <div class="dia">
+    <div class="frame red"><span class="tag">como funciona hoje — verificado no cliente HTTP</span>
+      <pre class="tree" style="margin:0"><i>// makeApi.js — os dois mecanismos na MESMA requisicao</i>
+delete axios.defaults.headers.common['Authorization']
+axios.defaults.withCredentials = true            <i>// cookie transportando o JWT</i>
+if (personalToken) {
+  axios.defaults.headers.common['Authorization'] = `token ${personalToken}`
+}
+
+<i>// AxiosHttpClientAdapter.js — decisao vem de variavel de BUILD,</i>
+<i>// lida em escopo de modulo a cada requisicao.</i>
+axios = defaultApi(import.meta.env.VITE_PERSONAL_TOKEN)</pre>
+      <div class="note r" style="margin:16px 0 0"><span class="lb">Consequências</span>
+        <p>Sem interceptor, o 401 só aparece quando o usuário navega. A reescrita de cookie na borda
+          descarta o <code>HttpOnly</code>, então o JWT fica legível por JavaScript. E trocar de
+          modelo exige mexer em vários lugares.</p></div>
+    </div>
+
+    <div class="arr"></div>
+
+    <div class="frame acc"><span class="tag">os três mecanismos, que continuam existindo</span>
+      <div class="grid g3">
+        <div class="node"><b>JWT</b><span>emitido por POST /token, renovado por /token/refresh</span></div>
+        <div class="node"><b>Cookie</b><span>transporta o JWT nas chamadas seguintes</span></div>
+        <div class="node"><b>Personal token</b><span>header Authorization, para automação</span></div>
+      </div>
+      <div class="arr"></div>
+      <div class="grid g3">
+        <div class="node hot"><b>'hybrid'</b>
+          <span>cookie + Authorization quando houver personal token — reproduz o Console atual</span></div>
+        <div class="node"><b>'jwt'</b>
+          <span>somente JWT. Nenhum header Authorization</span></div>
+        <div class="node"><b>'personal-token'</b>
+          <span>somente Authorization. Sem cookie. CI e automação</span></div>
+      </div>
+      <div class="arr"></div>
+      <pre class="tree" style="margin:0"><i>// app/core/config/constants.ts</i>
+export const CREDENTIAL = {
+  <b>/**
+   * Modo de transporte de credencial.
+   * origem:  NUXT_PUBLIC_CREDENTIAL_MODE
+   * valores: 'hybrid' | 'jwt' | 'personal-token'
+   * padrao:  'hybrid' — permite migrar sem parada
+   */</b>
+  mode: 'hybrid'
+} as const
+
+export interface <b>AuthStrategy</b> {
+  attach(request: Request): Request       <i>// cookie, header, ou ambos</i>
+  resolveIdentity(): Promise&lt;Identity&gt;    <i>// claims do JWT</i>
+  onUnauthorized(): Promise&lt;void&gt;         <i>// ponto unico de 401</i>
+  login(c: Credentials): Promise&lt;void&gt;
+  logout(): Promise&lt;void&gt;
+}</pre>
+    </div>
+  </div>
+  <p class="dia-cap"><b>Figura 3.</b> Os três mecanismos não mudam — o que muda é que a combinação
+    passa a ser uma constante, e não uma variável de build mutando estado global.</p>
+
+  <div class="grid g2">
+    <div class="note"><span class="lb">Por que <code>jwt</code> e não <code>session</code></span>
+      <p>JWT foi criado para dispensar sessão no servidor: as claims estão dentro do token. Chamar o modo de
+        <code>session</code> afirmaria o oposto do mecanismo — e pelo mesmo motivo o AppContext
+        carrega <code>identity</code>, não <code>session</code>.</p></div>
+  </div>
+
+  <h3>bff-session: variante de transporte, não um quarto modo</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Aspecto</th><th><code>jwt</code></th><th><code>bff-session</code></th></tr></thead>
+    <tbody>
+      <tr><td>Estado no servidor</td><td>nenhum</td><td>guarda o token</td></tr>
+      <tr><td>JWT alcançável por JavaScript</td><td>sim, com o cookie atual</td><td>não</td></tr>
+      <tr><td>Exige rota de servidor publicada</td><td>não</td><td>sim</td></tr>
+      <tr><td>Disponível no clone do repositório</td><td>sim</td><td>só se o operador publicar</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lb">O trade-off é explícito</span>
+    <p>Adotar <code>bff-session</code> é <strong>abrir mão de stateless</strong> para tirar a
+      credencial do alcance do JavaScript. Não é melhoria gratuita, é troca — e por isso fica como
+      opção declarada, não como padrão.</p></div>
+</section>
+
+<!-- ============================================================ 04 -->
+<section id="s4">
+  <h2><span class="n">04</span> Camada de serviços — a fachada única e a escolha da instância</h2>
+  <p>O console-kit tem quatro gerações de serviço convivendo e cinco mecanismos diferentes
+    decidindo qual usar conforme a conta. A fundação reduz isso a uma hierarquia de seis níveis
+    e a dois pontos de decisão auditáveis.</p>
+
+  <div class="dia">
+    <div class="grid g2">
+      <div>
+        <div class="frame"><span class="tag">a hierarquia — do abstrato ao concreto</span>
+          <div class="flow">
+            <div class="step hot"><b><i>N0</i>Contratos — a fachada que todo serviço satisfaz</b>
+              <span><code>list · get · create · update · remove</code> — os mesmos nomes em
+                todos os resources</span></div>
+            <div class="arr"></div>
+            <div class="step"><b><i>N1</i>apiFetch — o único cliente HTTP</b>
+              <span>monta a URL pela versão declarada, anexa a credencial da estratégia ativa
+                e o id de correlação</span></div>
+            <div class="arr"></div>
+            <div class="step"><b><i>N2</i>ResourceService — a classe base</b>
+              <span>fluxo fixo: chama a API, passa pelo adapter e invalida o cache — é o único
+                lugar do sistema que invalida</span></div>
+            <div class="arr"></div>
+            <div class="step"><b><i>N3</i>createResourceAdapter — a fábrica</b>
+              <span>transformadores puros de payload; é o único lugar que conhece o formato de
+                dados da API</span></div>
+            <div class="arr"></div>
+            <div class="step ok"><b><i>N4</i>O resource concreto — cerca de vinte linhas</b>
+              <span>declara a URL base, a versão da API, o editor e as chaves de cache.
+                Nada mais.</span></div>
+            <div class="arr"></div>
+            <div class="step"><b><i>N5</i>Quem consome os serviços</b>
+              <span>DefaultShell, tela de listagem e a VersionShell — todos falam com a mesma
+                fachada</span></div>
+          </div>
+        </div>
+        <div class="frame vio" style="margin-top:12px"><span class="tag">extensão versionada</span>
+          <p style="font-size:13px;margin:0">A VersionShell estende esta mesma classe base e
+            acrescenta o ciclo de vida das versões.</p></div>
+      </div>
+      <div class="frame"><span class="tag">como a instância certa é escolhida</span>
+        <div class="flow">
+          <div class="step"><b><i>1</i>AppContext</b>
+            <span>sessão, permissões, modelo de configuração e tema</span></div>
+          <div class="arr"></div>
+          <div class="step hot"><b><i>2</i>resolveMode() devolve o modo</b>
+            <span>função pura: contexto + capacidades do resource → ShellMode e motivo</span></div>
+          <div class="arr"></div>
+          <div class="step hot"><b><i>3</i>A Shell provê o ResourceContext</b>
+            <span>com modo e referência já fixados — o miolo não os vê</span></div>
+          <div class="arr"></div>
+          <div class="step"><b><i>4</i>O serviço não guarda estado</b>
+            <span>nada do usuário fica preso nele entre requests</span></div>
+          <div class="arr"></div>
+          <div class="step"><b><i>5</i>A chamada usa a fachada canônica</b>
+            <span>a tela nunca escolhe endpoint nem versão</span></div>
+          <div class="arr"></div>
+          <div class="step"><b><i>6</i>apiFetch resolve a URL da versão</b>
+            <span>declarada pelo adapter — uma linha de código</span></div>
+          <div class="arr"></div>
+          <div class="step ok"><b>API da plataforma — v3, v4 ou v6</b>
+            <span>a versão da conta age uma única vez, no passo 2; a versão da API é uma
+              declaração no adapter</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note r" style="margin:18px 0 0"><span class="lb">Hoje</span>
+      <p>Essa escolha está espalhada por cinco mecanismos diferentes — inclusive dentro de
+        adapters — e a versão da API aparece cravada em 56 pontos do código.</p></div>
+  </div>
+  <p class="dia-cap"><b>Figura 4.</b> O padrão não é invenção nova: é a generalização do
+    <code>VersionServiceBase</code> e do <code>createVersionAdapter</code> que o próprio
+    console-kit já provou em produção no VersionShell. A diferença é que ali eles atendem só
+    aos recursos versionados; aqui, atendem todos.</p>
+
+  <h3>O modo é o discriminante, e é um tipo</h3>
+  <p>Toda a diferença entre operar no modo default e operar sobre uma versão cabe num tipo. Um
+    booleano obrigaria cada chamada a lembrar de passar o <code>versionId</code> e permitiria o
+    estado inválido “versionado sem versão”.</p>
+  <pre class="tree"><i>// app/core/contracts/shell-mode.ts</i>
+<i>// Dois eixos separados. O modo decide a Shell; a referencia identifica.</i>
+export type ShellMode = <b>'create' | 'default' | 'versioned'</b>
+
+export interface ResourceRef {
+  resourceId?: Id     <i>// ausente em create</i>
+  versionId?: Id      <i>// presente somente em versioned</i>
+}
+
+<i>// A Shell e DERIVADA do modo. Duas Shells para tres modos.</i>
+export const <b>shellFor</b> = (mode: ShellMode) =&gt;
+  mode === 'versioned' ? VersionShell : DefaultShell
+
+<i>// A URL, a queryKey e o payload derivam de modo + referencia.</i>
+export const resourcePath = (mode: ShellMode, ref: ResourceRef, base: string) =&gt;
+  mode === 'versioned'
+    ? `${base}/${ref.resourceId}/versions/${ref.versionId}`
+    : `${base}/${ref.resourceId ?? ''}`</pre>
+  <div class="grid g2">
+    <div class="note"><span class="lb">Três modos, duas Shells</span>
+      <p><code>shellFor(mode)</code> devolve VersionShell para <code>versioned</code> e DefaultShell
+        para <code>new</code> e <code>default</code>. Criar não é uma Shell: é um modo. O editor, o
+        schema e a validação são os mesmos — muda a ação, <code>create</code> em vez de
+        <code>save</code>.</p></div>
+    <div class="note"><span class="lb">E login não é uma Shell</span>
+      <p>Login acontece <strong>fora</strong> da AppShell: sem sessão, sem conta, sem navegação. É
+        ausência de moldura, não uma moldura diferente — uma página com outro layout.</p></div>
+  </div>
+
+  <h3>O contexto do resource — onde a Shell troca o miolo</h3>
+  <p>O modo não é passado de mão em mão: é um campo do <strong>contexto do resource</strong>,
+    um único contrato que a Shell provê e o miolo consome. Miolo é o que está sendo operado —
+    editor, tabs, listagens de sub-recurso. A Shell troca o miolo mantendo o contrato.</p>
+  <pre class="tree"><i>// app/core/contracts/resource-context.ts</i>
+export const RESOURCE_CONTEXT = Symbol('resourceContext')
+
+export interface ResourceContext&lt;TEntity&gt; {
+  mode:         Readonly&lt;Ref&lt;ShellMode&gt;&gt;         <i>// o que a Shell decidiu</i>
+  ref:          Readonly&lt;Ref&lt;ResourceRef&gt;&gt;       <i>// o que esta sendo operado</i>
+  resource:    Readonly&lt;Ref&lt;TEntity | null&gt;&gt;     <i>// o miolo em operacao</i>
+  service:     ResourceService&lt;TEntity&gt;         <i>// com modo e referencia fixados</i>
+  state:       Readonly&lt;Ref&lt;State&gt;&gt;              <i>// um estado na Default, o ciclo na Version</i>
+  readOnly:    Readonly&lt;Ref&lt;boolean&gt;&gt;
+  actions:     Readonly&lt;Ref&lt;ActionKey[]&gt;&gt;        <b>// estado ∩ capacidade declarada</b>
+  permissions: PermissionContext
+  dispatch(action: ActionKey, payload?: unknown): Promise&lt;void&gt;
+}
+
+<i>// Defaults seguros: o componente funciona fora de uma Shell.</i>
+export const useResourceContext = &lt;T&gt;() =&gt;
+  inject&lt;ResourceContext&lt;T&gt;&gt;(RESOURCE_CONTEXT, DEFAULT_CONTEXT)</pre>
+  <div class="tw"><table>
+    <thead><tr><th>Campo</th><th>DefaultShell provê</th><th>VersionShell provê</th></tr></thead>
+    <tbody>
+      <tr><td class="m">mode</td><td class="m">'create' ou 'default'</td><td class="m">'versioned'</td></tr>
+      <tr><td class="m">ref</td><td class="m">{ resourceId }</td><td class="m">{ resourceId, versionId }</td></tr>
+      <tr><td class="m">resource</td><td>a entidade efetiva</td><td>a versão em foco</td></tr>
+      <tr><td class="m">service</td><td>com modo default fixado</td><td>com modo versionado fixado</td></tr>
+      <tr><td class="m">state</td><td>um estado editável</td><td>o ciclo de vida completo</td></tr>
+      <tr><td class="m">actions</td><td>save</td><td>estado ∩ capacidade declarada</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g2">
+    <div class="note r"><span class="lb">Hoje: chave por resource</span>
+      <p>O resource é provido por string — uma chave diferente por seção. O componente precisa
+        saber de qual resource é filho para injetar.</p></div>
+    <div class="note g"><span class="lb">Defaults seguros</span>
+      <p>Fora de qualquer Shell, o componente recebe estado editável e nenhuma ação. É o que
+        permite migrar tela por tela sem quebrar o que ainda não foi migrado.</p></div>
+  </div>
+  <div class="note"><span class="lb">O que o contexto resolve além da simetria</span>
+    <p>Trocar de versão, ou de conta, passa a ser <strong>prover um contexto novo</strong> — não
+      remontar a árvore. Hoje o remount forçado por chave é obrigatório porque os identificadores
+      são capturados por valor na montagem, e o custo é perder o estado da interface.</p></div>
+
+  <div class="note g"><span class="lb">useResourceService</span>
+    <p>O consumidor recebe o service com modo e referência já fixados e não os vê. É o
+      que permite a mesma listagem de sub-recurso funcionar nas duas Shells sem uma linha de
+      diferença — eliminando a facade escrita à mão por sub-recurso.</p></div>
+</section>
+
+<!-- ============================================================ 05 -->
+<section id="s5">
+  <h2><span class="n">05</span> Roteamento — a rota que se duplica e a rota que decide</h2>
+  <div class="dia">
+    <div class="grid g2">
+      <div class="frame red"><span class="tag">hoje: a rota se divide</span>
+        <div class="flow">
+          <div class="step"><b>/applications/edit/123</b><span>o usuário abre</span></div>
+          <div class="arr"></div>
+          <div class="step bad" style="border-color:var(--red-line);background:var(--red-bg)">
+            <b>Ternário dentro do import da rota</b>
+            <span>lê a feature flag da conta e decide o arquivo</span></div>
+          <div class="arr"></div>
+          <div class="grid g2">
+            <div class="node"><b>tela legada</b><span>importa</span></div>
+            <div class="node"><b>tela versionada</b><span>importa</span></div>
+          </div>
+        </div>
+        <ul class="tick r">
+          <li>o ternário é avaliado uma única vez por sessão</li>
+          <li>trocar de conta sem recarregar mantém a tela errada</li>
+          <li>existem dezesseis divisões iguais a esta no projeto</li>
+          <li>rotas só-versionadas ainda precisam de um guard extra</li>
+          <li>a mesma tela existe em dois arquivos paralelos</li>
+        </ul>
+      </div>
+      <div class="frame acc"><span class="tag">na fundação: uma rota só</span>
+        <div class="flow">
+          <div class="step"><b>/applications/edit/123</b><span>o usuário abre</span></div>
+          <div class="arr"></div>
+          <div class="step"><b>Rota única</b><span>canônica do resource, serve os dois modos</span></div>
+          <div class="arr"></div>
+          <div class="step hot"><b>O ShellResolver aplica resolveMode()</b><span>a cada request</span></div>
+          <div class="arr"></div>
+          <div class="grid g2">
+            <div class="node"><b>DefaultShell</b><span>quando o modo default se aplica</span></div>
+            <div class="node vio"><b>VersionShell</b><span>quando o versionado se aplica</span></div>
+          </div>
+        </div>
+        <ul class="tick g">
+          <li>a mesma URL serve os dois modos</li>
+          <li>a decisão é refeita quando o contexto muda</li>
+          <li>um link compartilhado funciona em qualquer conta</li>
+          <li>o motivo da escolha vai para a telemetria</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note" style="margin:18px 0 0"><span class="lb">Parâmetro de versão</span>
+      <p>A rota com <code>?version=…</code> chega junto com o módulo versioning e é validada por
+        um middleware próprio — nunca por uma rota paralela. A URL canônica do resource
+        permanece a mesma em qualquer cenário.</p></div>
+  </div>
+  <p class="dia-cap"><b>Figura 5.</b> A diferença é uma só, mas é estrutural: hoje a decisão
+    está no <i>import</i> da rota, avaliado uma vez e congelado pelo vue-router no próprio
+    record; na fundação ela está no componente que monta a tela, e é reavaliada sempre que o
+    contexto muda.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Rota</th><th>Origem</th><th>Middleware</th><th>Shell</th><th>Dados</th></tr></thead>
+    <tbody>
+      <tr><td class="m">/login</td><td>core estática</td><td>— (pública)</td><td>fora da AppShell — layout próprio</td><td class="m">credential.login()</td></tr>
+      <tr><td class="m">/</td><td>core estática</td><td class="m">auth.global</td><td>AppShell</td><td class="m">useAppContext()</td></tr>
+      <tr><td class="m">/network-lists</td><td>gerada no build</td><td class="m">auth.global</td><td>AppShell</td><td class="m">service.list()</td></tr>
+      <tr><td class="m">/network-lists/:id</td><td>gerada no build</td><td class="m">auth.global</td><td><strong>ShellResolver decide</strong></td><td class="m">service.get(id)</td></tr>
+      <tr><td class="m">/network-lists/create</td><td>core</td><td class="m">auth.global</td><td>DefaultShell · modo <span class="m">new</span></td><td class="m">service.create()</td></tr>
+      <tr><td class="m">/api/auth/*</td><td>core server routes</td><td>— (é o servidor)</td><td>—</td><td>estratégia ↔ API de auth</td></tr>
+    </tbody>
+  </table></div>
+  <p style="font-size:13px;color:var(--mut)">A rota canônica do resource é única e serve os dois modos. Hoje existem dezesseis divisões de rota por feature flag no projeto, cada uma congelando a decisão na primeira navegação.</p>
+</section>
+
+<!-- ============================================================ 06 -->
+<section id="s6">
+  <h2><span class="n">06</span> Fronteiras de import — o que pode depender do quê</h2>
+  <p>A divergência do console-kit não veio de descuido: as convenções existiam, mas nada verificava se estavam sendo seguidas.
+    Aqui cada fronteira é uma regra de lint que quebra o build.</p>
+
+  <div class="dia">
+    <div class="grid g3">
+      <div class="frame grn"><span class="tag">domínio — app/resources/</span>
+        <div class="grid">
+          <div class="node ok"><b>schema.ts</b><span>valida no submit e tipa o editor</span></div>
+          <div class="node ok"><b>adapters/</b><span>versão da API e payload</span></div>
+          <div class="node ok"><b>editor .vue</b><span>campos e validação</span></div>
+        </div>
+      </div>
+      <div class="frame acc"><span class="tag">capacidades — app/core/</span>
+        <div class="grid">
+          <div class="node"><b>contratos tipados</b><span>a fachada canônica</span></div>
+          <div class="node"><b>ResourceService</b><span>o fluxo fixo de dados</span></div>
+          <div class="node"><b>apiFetch</b><span>o único cliente HTTP</span></div>
+          <div class="node"><b>shells e telas</b><span>montam a interface</span></div>
+          <div class="node"><b>middlewares</b><span>sessão e rota de retorno</span></div>
+        </div>
+      </div>
+      <div class="frame"><span class="tag">externo</span>
+        <div class="grid">
+          <div class="node"><b>API da plataforma</b><span>v3, v4 e v6</span></div>
+          <div class="node"><b>@aziontech/webkit</b><span>componentes e tokens</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="frame red" style="margin-top:16px"><span class="tag">o que o lint bloqueia no CI</span>
+      <ul class="tick r">
+        <li>a tela nunca faz uma chamada HTTP direta</li>
+        <li>o core nunca importa código de domínio</li>
+        <li>um resource não importa outro resource</li>
+      </ul>
+    </div>
+  </div>
+  <p class="dia-cap"><b>Figura 6.</b> O resource conhece apenas os contratos do core e o design
+    system. O core nunca aponta para o domínio — quem liga os dois é o build. É essa assimetria
+    que permite acrescentar uma seção nova sem tocar em nada compartilhado.</p>
+</section>
+
+<!-- ============================================================ 07 -->
+<section id="s7">
+  <h2><span class="n">07</span> Por que reconstruir — quatro subsistemas medidos</h2>
+  <p>O gatilho é o novo Design System: reconstruir a apresentação de todo o Console é
+    inevitável. A pergunta é se vamos reconstruir sobre a mesma base. O projeto atual não foi
+    desenhado para <strong>manutenibilidade</strong>, <strong>performance</strong> nem
+    <strong>segurança</strong>. Cresceu por convenção, e convenção sem verificação automática
+    diverge. Abaixo, a divergência medida em <strong>quatro subsistemas</strong>, com o atributo que
+    cada um compromete. Cada número é contagem no repositório.</p>
+
+  <div class="grid g2">
+    <div class="frame red"><span class="tag">camada de serviços · manutenibilidade</span>
+      <ul class="tick r">
+        <li><strong>Três padrões</strong> na camada de serviços: 145 arquivos no padrão funcional
+          legado, 63 classes estendendo a base, 6 híbridos</li>
+        <li>Quem escreve um resource novo <strong>escolhe entre três estilos</strong>; nenhum é
+          errado, então todos persistem</li>
+        <li><strong>29 ListViews</strong> importam o mesmo par de templates de chrome; 114 de 437
+          views montam o chrome direto</li>
+        <li><strong>45 views</strong> declaram array de actions inline; 44 reimplementam a
+          exclusão; 25 embutem o service no objeto da ação</li>
+        <li><strong>206 views</strong> importam service direto; as dez maiores têm de 814 a
+          1.456 linhas</li>
+      </ul>
+    </div>
+    <div class="frame red"><span class="tag">apresentação e ações · manutenibilidade e performance</span>
+      <ul class="tick r">
+        <li>Actions e colunas montadas por tela, não derivadas de contrato: <strong>o resource
+          carrega o conjunto completo</strong> independente de estado e permissão</li>
+        <li>O custo é pago no bundle e no primeiro render, para ações que muitas vezes não podem
+          ser executadas</li>
+        <li>Sessão e flag resolvidas no cliente, em cascata: <strong>requisições bloqueantes
+          antes do primeiro pixel</strong></li>
+        <li>Sem moldura persistente, navegar remonta chrome que deveria ser estável</li>
+        <li>Invalidação de cache espalhada — refetch redundante, sem dono</li>
+      </ul>
+    </div>
+    <div class="frame red"><span class="tag">credencial e sessão · segurança</span>
+      <ul class="tick r">
+        <li>A reescrita de cookie na borda <strong>descarta o HttpOnly</strong>: credencial de
+          longa duração legível por JavaScript</li>
+        <li>Credencial escolhida por <strong>efeito colateral em estado global</strong> — o modo
+          ativo não é auditável</li>
+        <li><strong>Nenhum interceptor</strong> de resposta: a expiração só é percebida ao
+          navegar</li>
+        <li>Booleano em armazenamento local como <strong>porteiro de rota</strong></li>
+        <li>Logout <strong>não limpa cache nem estado</strong> do cliente</li>
+      </ul>
+    </div>
+    <div class="frame red"><span class="tag">roteamento de rede · manutenibilidade e segurança</span>
+      <ul class="tick r">
+        <li><strong>Sete mecanismos</strong> podem definir o prefixo de uma chamada — 87
+          <code>baseURL</code> em quatro grafias, 49 helpers de base, 70 overrides no call site</li>
+        <li><strong>Oito formas de URL</strong>, três produzindo a mesma URL: não existe forma
+          correta a copiar</li>
+        <li>Tabela de roteamento <strong>duplicada com precedência oposta</strong> — e nenhum teste
+          falha se só uma for editada</li>
+        <li>Versão declarada <strong>três vezes em desacordo</strong>: no path, no <code>Accept</code>
+          e numa regra de edge que força versão 3</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note r"><span class="lb">O padrão se repete nos quatro subsistemas</span>
+    <p>Em todos os casos a decisão certa existe em algum lugar do código — mas sem dono único e
+      sem enforcement. Então cada feature re-decide, e o sistema diverge. Não é falta de cuidado:
+      é ausência de arquitetura que torne a decisão obrigatória.</p></div>
+
+  <div class="note"><span class="lb">O que o roteamento de rede exige da fundação</span>
+    <p>Três requisitos, e o desenho está na seção 04. <strong>O prefixo é declaração, nunca
+      literal</strong> — enquanto puder ser escrito em sete lugares, será. <strong>A tabela de
+      roteamento tem uma fonte só</strong>, com as duas configs como artefato gerado e verificação
+      de acordo no CI. E <strong>serviço e contrato são eixos distintos</strong>: o desacordo das
+      três declarações de versão mostra que v3, v4 e v6 são serviços com contratos diferentes, não
+      versões de um mesmo — o que invalida a premissa da decisão pendente sobre o nome do eixo.</p></div>
+
+  <div class="note g"><span class="lb">A contraprova já existe no Console</span>
+    <p>O versionamento foi entregue recentemente e cumpriu o papel: passou a suportar o ciclo de
+      vida versionado em todos os resources com custo marginal por resource e sem drift entre
+      eles. Ele tem dono único, contrato explícito e verificação automática contra fork — e é
+      exatamente por isso que funcionou. O que esta fundação faz é generalizar esse mesmo padrão
+      para autenticação, serviços, roteamento e apresentação.</p></div>
+</section>
+
+<!-- ============================================================ 08 -->
+<section id="s8">
+  <h2><span class="n">08</span> Onde vive cada coisa</h2>
+  <pre class="tree">console-nuxt/
+├── <b>nuxt.config.ts</b>              <i>aliases @core e @versioning · runtimeConfig · CSS</i>
+├── <b>eslint.config.js</b>            <i>fronteiras de import — quebra o build no CI</i>
+├── <u>app/resources/network-lists/</u>  <i>DOMÍNIO — o modelo que toda seção nova copia</i>
+│   ├── support.ts              <i>onde e versionado e a chave de rota</i>
+│   ├── api.ts                  <i>URL base e transform de payload por geracao</i>
+│   ├── schema.ts               <i>zod: valida e tipa. NAO descreve UI</i>
+│   ├── capabilities.ts         <i>quais acoes existem, por modo</i>
+│   ├── NetworkListForm.vue     <i>estabelece o formulario. Template: &lt;slot /&gt;</i>
+│   └── NetworkListFields.vue   <i>os campos, conectados por useField</i>
+└── <b>app/core/</b>
+    ├── server/api/auth/        <i>OPCIONAL — apenas para a variante bff-session</i>
+    ├── app/
+    │   ├── components/shell/   <i>AppShell · ShellResolver · DefaultShell</i>
+    │   ├── composables/        <i>formulário, dirty guard, listagem, detalhe, sessão, permissões</i>
+    │   ├── middleware/         <i>auth.global — sessão e rota de retorno</i>
+    │   ├── plugins/            <i>http · vue-query · toast · tema no servidor · fontes</i>
+    │   └── error.vue           <i>erro apresentável com id de correlação e ação de retry</i>
+    └── shared/
+        ├── config/constants.ts <i>CREDENTIAL.mode · API.base · cache · limites</i>
+        ├── auth/               <b>AuthStrategy: hybrid · jwt · personal-token</b>
+        ├── contracts/          <i>ResourceManifest · ShellMode · fachada canônica</i>
+        └── http/               <i>apiFetch · ApiError · correlação · ponto único de 401</i></pre>
+  <p style="font-size:13px;color:var(--mut)">Fora do desenho: <code>.claude/</code> com o bundle
+    do webkit e as regras próprias do Console, <code>.mcp.json</code> com o catálogo consultável
+    por agentes, e <code>tests/</code> com o kit de contratos compartilhados. O módulo
+    <code>versioning</code> fica ao lado do core, consumindo os mesmos contratos.</p>
+</section>
+
+<!-- ============================================================ 09 -->
+<section id="s9">
+  <h2><span class="n">09</span> Repositório aberto e whitelabel</h2>
+  <p>O repositório é de código aberto e precisa permitir whitelabel. Isso não é só licença: é
+    <strong>restrição de desenho</strong>. O deploy vive em outro repositório, com infraestrutura
+    como código.</p>
+  <div class="note g"><span class="lb">Por que isso testa a arquitetura</span>
+    <p>Se uma constante não puder ser externalizada com valor de exemplo, é porque existe regra de
+      negócio escondida onde deveria haver configuração. A exigência do whitelabel funciona como
+      verificação: o que não sai para constante é acoplamento que ninguém declarou.</p></div>
+
+  <h3>O que não entra</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Fora</th><th>Onde vive</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>Deploy e infraestrutura</td><td>repositório de IaC</td><td>Não é código de aplicação</td></tr>
+      <tr><td>Segredos e credenciais</td><td>ambiente do operador</td><td>Nunca versionados</td></tr>
+      <tr><td>Endpoints internos cravados</td><td>constante com padrão</td><td>Um fork aponta para a própria API</td></tr>
+      <tr><td>Regras de processo do time</td><td>fora do repositório</td><td>Commit, branch e revisão são do time, não da arquitetura</td></tr>
+      <tr><td>Rota de credencial no servidor</td><td>opcional, publicada pelo operador</td><td>Só a variante bff-session depende dela</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>A regra das constantes — padrão, origem, valores, comentário</h3>
+  <pre class="tree"><i>// app/core/config/constants.ts</i>
+export const API = {
+  <b>/**
+   * Base da API da plataforma.
+   * origem:  NUXT_PUBLIC_API_BASE
+   * exemplo: 'https://api.azion.com' | 'https://api.meudominio.com'
+   * padrao:  '' — vazio FALHA no bootstrap com mensagem explicita, em vez de
+   *          apontar para host de terceiro em silencio.
+   */</b>
+  base: '',
+} as const</pre>
+  <div class="note r"><span class="lb">Por que o padrão da base é vazio</span>
+    <p>Um padrão apontando para a API da Azion faria um fork mal configurado enviar dados para
+      infraestrutura de terceiro sem avisar. <strong>Falha explícita é preferível a comportamento
+      silencioso.</strong></p></div>
+  <pre class="tree"><i># .env.example — artefato de primeira classe, versionado e comentado</i>
+
+<i># ---- API da plataforma ----</i>
+<i># Obrigatorio. Sem isso a aplicacao falha no bootstrap.</i>
+NUXT_PUBLIC_API_BASE=https://api.exemplo.com
+
+<i># ---- Credencial ----</i>
+<i># hybrid | jwt | personal-token   (hybrid reproduz o Console atual)</i>
+NUXT_PUBLIC_CREDENTIAL_MODE=hybrid
+<i># Somente no modo personal-token. Nunca versionar valor real.</i>
+NUXT_PERSONAL_TOKEN=
+
+<i># ---- Modelo de configuracao ----</i>
+<i># v3 | v4 | v6 — usado quando nao houver flag avaliada.</i>
+NUXT_PUBLIC_DEFAULT_CONFIGURATION_MODEL=v3
+
+<i># ---- Feature flags ----</i>
+<i># Endpoint OFREP, se houver. Vazio usa os padroes dos flags.</i>
+NUXT_PUBLIC_OFREP_URL=</pre>
+
+  <h3>Guardrails: arquitetura fica, processo sai</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Guardrail</th><th>O que verifica</th><th>Fica?</th></tr></thead>
+    <tbody>
+      <tr><td>Lint de fronteira de import</td><td>core nunca importa domínio; resource não importa resource</td><td>sim</td></tr>
+      <tr><td>Teste de enumeração estado × ações</td><td>A matriz é a única fonte</td><td>sim</td></tr>
+      <tr><td>Constante sem documentação</td><td>Toda constante tem padrão, origem e valores</td><td>sim</td></tr>
+      <tr><td>Leitura de ambiente fora de config</td><td>Nenhum arquivo além de config lê env</td><td>sim</td></tr>
+      <tr><td>Ausência de chunk em modo direto</td><td>Nada de versioning baixado sem necessidade</td><td>sim</td></tr>
+      <tr><td>Formato de mensagem de commit</td><td>convenção de escrita do time</td><td><b>não</b></td></tr>
+      <tr><td>Nome de branch e revisão</td><td>processo interno</td><td><b>não</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lb">O hook valida a arquitetura, não o autor</span>
+    <p>Um pre-commit que roda lint de fronteira e o teste de enumeração protege invariantes e é
+      bem-vindo. Um hook que exige prefixo em mensagem de commit impõe processo — e um fork o
+      remove na primeira semana.</p></div>
+
+  <h3>CLAUDE.md e skills</h3>
+  <div class="grid g2">
+    <div class="frame grn"><span class="tag">entra no CLAUDE.md</span>
+      <ul class="tick g">
+        <li>a direção de dependência entre módulos e o que o lint bloqueia</li>
+        <li>que a matriz de estados é a única fonte de ações</li>
+        <li>que nenhum arquivo além de config lê ambiente</li>
+        <li>que o editor não importa service nem lê flag</li>
+        <li>onde consultar o catálogo de componentes</li>
+      </ul>
+    </div>
+    <div class="frame red"><span class="tag">não entra</span>
+      <ul class="tick r">
+        <li>como abrir pull request</li>
+        <li>quem revisa o quê</li>
+        <li>cadência de release</li>
+        <li>nome de branch</li>
+        <li>ferramenta de gestão de tarefas</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Skill</th><th>O que cobre</th><th>Verificação</th></tr></thead>
+    <tbody>
+      <tr><td>Criar um service de resource</td>
+        <td>Declaração da API por geração, transform de payload, service que estende a base</td>
+        <td>Lint de fronteira e teste do transform</td></tr>
+      <tr><td>Criar uma ação no Shell</td>
+        <td>Nomear no union, declarar na matriz, abrir método opcional no contrato, implementar no
+          Adapter do resource que suporta</td>
+        <td>Teste de enumeração estado × ações</td></tr>
+      <tr><td>Criar um resource completo</td>
+        <td>Os artefatos da seção 11, na ordem, mais rota e item de navegação</td>
+        <td>Gate de CI: nenhum arquivo compartilhado alterado</td></tr>
+      <tr><td>Usar componentes do design system</td>
+        <td>Consultar o catálogo por MCP; nunca escrever primitive à mão nem duplicar token</td>
+        <td>Lint que proíbe cor e tipografia fora de token</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g2">
+    <div class="note"><span class="lb">Por que a skill consulta, em vez de listar</span>
+      <p>Uma lista de componentes escrita à mão fica desatualizada a cada release do design system. O catálogo por MCP é gerado do próprio pacote.
+        Pelo mesmo motivo, <strong>os exemplos de campo neste documento são ilustrativos</strong> — a
+        API real é a do catálogo.</p></div>
+    <div class="note"><span class="lb">Suposição a confirmar</span>
+      <p>Este documento assume que o catálogo por MCP é <strong>ferramenta de autoria</strong>:
+        consultado ao escrever o código, ausente da aplicação em execução. Se a aplicação também
+        consultar em runtime, ele passa a ser dependência de execução e entra na Figura 1, com
+        política de cache e comportamento quando indisponível.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ 10 -->
+<section id="s10">
+  <h2><span class="n">10</span> Como a Shell sabe quais ações mostrar</h2>
+  <p>Uma Shell só pode oferecer ações válidas, e duas coisas independentes determinam validade:
+    o <strong>estado</strong> em que a coisa está, e se o resource <strong>implementa</strong>
+    aquela ação. Uma versão em build não aceita edição por causa do estado; um resource sem
+    arquivamento não oferece Archive por causa da implementação.</p>
+  <p>A dificuldade é que a Shell é genérica e o resource é específico. A Shell não pode importar
+    código de resource — se pudesse, cada resource novo mexeria na Shell.</p>
+
+  <h3>O que é um barramento de comandos</h3>
+  <p>O Console atual resolve isso com um barramento. Vale explicar, porque é o mecanismo que
+    substituímos e o termo não é autoexplicativo: um barramento é um objeto central onde o
+    componente interno <strong>registra funções sob um nome</strong> — <code>SAVE</code>,
+    <code>ARCHIVE</code> — e onde a Shell <strong>dispara aquele nome</strong> sem saber quem vai
+    atender. Inversão de dependência: a Shell depende do barramento, nunca do resource.</p>
+  <p>A Shell então cruza duas listas — as ações que o estado permite e as que foram registradas.
+    O que está nas duas aparece na tela. <strong>Esse cruzamento é a ideia certa e nós
+    mantemos.</strong> O que trocamos é o registro por nome.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Problema do registro por nome</th><th>Consequência</th><th>Na fundação</th></tr></thead>
+    <tbody>
+      <tr><td>O registro é uma tabela reativa de comportamento sutil</td>
+        <td>Trocar o tipo de reatividade inverte o resultado: formulário válido fica com o botão
+          desabilitado. Documentado como armadilha conhecida.</td>
+        <td>Objeto comum, sem estado reativo intermediário</td></tr>
+      <tr><td>Disparar um nome sem quem atenda só falha executando</td>
+        <td>O erro aparece para o usuário, não para quem escreveu o código.</td>
+        <td>Método ausente é erro de compilação</td></tr>
+      <tr><td>Navegação precisou virar comando com função vazia</td>
+        <td>Existe um comando que não faz nada, só para o cruzamento incluir o botão.</td>
+        <td>Navegação não é capacidade e sai do conjunto</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Onde vive o controle de estado</h3>
+  <p>O conjunto de ações visíveis é o cruzamento de <strong>quatro</strong> coisas, cada uma com um
+    dono diferente. Tratá-las como uma só é o que produz condicional espalhada.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Elemento</th><th>O que é</th><th>Onde vive</th><th>Origem do valor</th></tr></thead>
+    <tbody>
+      <tr><td>estado</td><td>draft, building, ready — ou novo e smodo</td>
+        <td>campo do ResourceContext</td><td>da API no modo versionado; do formulário no default</td></tr>
+      <tr><td>máquina de estados</td><td>função pura: estado → ações permitidas</td>
+        <td>módulo do dono da Shell</td><td>código, sem Vue e sem I/O</td></tr>
+      <tr><td>capacidades</td><td>o que o resource implementa</td>
+        <td class="m">capabilities.ts</td><td>presença do método</td></tr>
+      <tr><td>permissões</td><td>o que o usuário pode executar</td>
+        <td class="m">AppContext.session</td><td>resolvido no bootstrap</td></tr>
+    </tbody>
+  </table></div>
+  <pre class="tree"><i>// Cada Shell traz a sua maquina. Mesmo contrato, tamanhos diferentes.</i>
+export interface StateMachine&lt;S extends string&gt; {
+  initial: S
+  allowedActions(state: S): ActionKey[]        <b>// estado desconhecido -&gt; []</b>
+  isEditable(state: S): boolean
+}
+
+<i>// app/core/shells/default/machine.ts — dois estados</i>
+export const defaultMachine = {
+  initial: 'new',
+  allowedActions: (s) =&gt; (s === 'new' ? ['create'] : ['save', 'remove']),
+  isEditable: () =&gt; true
+}
+
+<i>// app/versioning/machine.ts — o ciclo completo, modulo puro</i>
+export const versionMachine = {
+  initial: 'draft',
+  allowedActions: (s) =&gt; STATE_ACTIONS[s] ?? [],          <b>// FAIL-CLOSED</b>
+  isEditable: (s) =&gt; s === 'draft' || s === 'canceled' || s === 'error'
+}
+
+<i>// app/core/shells/resolve-actions.ts — o cruzamento, um so, compartilhado</i>
+const available = machine.allowedActions(state)
+  .filter((a) =&gt; typeof caps[a] === 'function')          <i>// o resource implementa</i>
+  .filter((a) =&gt; permissions.can(permissionOf(a)))        <i>// o usuario pode</i>
+
+const enabled = available.filter((a) =&gt; !blocked.includes(a))  <i>// sem impedimento agora</i></pre>
+  <div class="tw"><table>
+    <thead><tr><th>Situação</th><th>Botão</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td>O estado não permite a ação</td><td>não é renderizado</td>
+        <td>Em building não existe Save. Desabilitado sugeriria que volta naquele estado</td></tr>
+      <tr><td>O resource não implementa</td><td>não é renderizado</td>
+        <td>Network List não tem promote. Não é impedimento — a ação não existe</td></tr>
+      <tr><td>Sem permissão</td><td>não é renderizado</td>
+        <td>O que não pode ser feito não é oferecido</td></tr>
+      <tr><td>Formulário inválido</td><td>renderizado e desabilitado</td>
+        <td>A ação existe e o estado permite; falta corrigir. Esconder faria o formulário parecer quebrado</td></tr>
+      <tr><td>Operação assíncrona em curso</td><td>renderizado e desabilitado</td>
+        <td>Evita disparo duplicado sem alterar o conjunto</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g2">
+    <div class="note r"><span class="lb">Por que separar ausente de desabilitado</span>
+      <p>Sem isso, um formulário inválido faria o botão Save <strong>desaparecer</strong> — pior do
+        que desabilitá-lo. E um resource sem determinada ação apareceria com botão morto.</p></div>
+    <div class="note g"><span class="lb">O estado é dado, a máquina é função</span>
+      <p>A máquina não guarda estado: responde o que é permitido a partir de um estado que vem de
+        fora. Isso a torna testável por enumeração — todos os estados contra todos os resources —
+        sem montar componente e sem simular API.</p></div>
+  </div>
+
+  <h3>A matriz: a fonte única do que é permitido</h3>
+  <p>A máquina do modo versionado é uma <strong>tabela</strong>. Cada linha é um estado e lista as
+    ações permitidas nele. Nada fora da tabela decide — a barra de ações, o menu da versão e o
+    cabeçalho leem dela.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Estado</th><th>Ações permitidas</th><th>Editável</th></tr></thead>
+    <tbody>
+      <tr><td class="m">draft</td><td class="m">save · saveAndBuild · newVersionFrom · remove</td><td>sim</td></tr>
+      <tr><td class="m">queued</td><td class="m">cancelBuild</td><td>não</td></tr>
+      <tr><td class="m">building</td><td class="m">cancelBuild</td><td>não</td></tr>
+      <tr><td class="m">ready</td><td class="m">newVersionFrom · archive · remove · promote</td><td>não</td></tr>
+      <tr><td class="m">active</td><td class="m">newVersionFrom · archive · remove · promote · rollback</td><td>não</td></tr>
+      <tr><td class="m">archived</td><td class="m">newVersionFrom · remove</td><td>não</td></tr>
+      <tr><td class="m">canceled</td><td class="m">save · saveAndBuild · newVersionFrom · remove</td><td>sim</td></tr>
+      <tr><td class="m">error</td><td class="m">save · saveAndBuild · newVersionFrom · remove</td><td>sim</td></tr>
+      <tr><td class="m">desconhecido</td><td>nenhuma</td><td>não</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid g2">
+    <div class="note r"><span class="lb">Por que draft não pode sofrer deploy</span>
+      <p><code>promote</code> não está na linha de <code>draft</code>. O botão não é renderizado —
+        não existe desabilitado, não existe condicional na Shell, não existe verificação no
+        componente. <strong>A ausência na tabela é o controle.</strong></p></div>
+    <div class="note r"><span class="lb">Por que ready não pode mais ser alterada</span>
+      <p>Dois controles independentes. <code>isEditable(ready)</code> é falso → <code>readOnly</code>
+        entra no ResourceContext e todo campo fica desabilitado. E <code>save</code> não está na
+        linha de <code>ready</code> → não existe ação que persista. Um só não bastaria.</p></div>
+  </div>
+  <pre class="tree"><i>// app/versioning/machine.ts — modulo puro: constantes e funcoes.</i>
+const STATE_ACTIONS: Record&lt;VersionState, ActionKey[]&gt; = {
+  draft:    ['save', 'saveAndBuild', 'newVersionFrom', 'remove'],
+  queued:   ['cancelBuild'],
+  building: ['cancelBuild'],
+  ready:    ['newVersionFrom', 'archive', 'remove', 'promote'],
+  active:   ['newVersionFrom', 'archive', 'remove', 'promote', 'rollback'],
+  archived: ['newVersionFrom', 'remove'],
+  canceled: ['save', 'saveAndBuild', 'newVersionFrom', 'remove'],
+  error:    ['save', 'saveAndBuild', 'newVersionFrom', 'remove']
+}
+
+const EDITABLE: VersionState[] = ['draft', 'canceled', 'error']
+
+export const versionMachine = {
+  initial: 'draft',
+  allowedActions: (s) =&gt; STATE_ACTIONS[s] ?? [],   <b>// desconhecido -&gt; []</b>
+  isEditable:     (s) =&gt; EDITABLE.includes(s)
+}</pre>
+  <div class="note"><span class="lb">A máquina é porteiro, não executor</span>
+    <p>A matriz diz o que pode ser <em>oferecido</em>; ela não faz a transição. Quem muda o estado é
+      o backend — o cliente executa a ação, o serviço invalida o cache e o novo estado chega no
+      refetch. Por isso a Shell nunca escreve estado, e por isso a validação no backend não é
+      redundante: <strong>é a autoridade</strong>.</p></div>
+
+  <h3>Como acrescentar uma ação nova</h3>
+  <p>Este é o teste de extensibilidade: acrescentar uma ação não deve tocar Shell, resolver nem
+    outros resources. Quatro passos, todos em lugares previsíveis.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Passo</th><th>Onde</th><th>O que fazer</th></tr></thead>
+    <tbody>
+      <tr><td>1 · Nomear a ação</td><td class="m">core/contracts</td>
+        <td>Acrescentar a chave ao union <code>ActionKey</code></td></tr>
+      <tr><td>2 · Declarar em que estados vale</td><td class="m">versioning/machine.ts</td>
+        <td>Acrescentar nas linhas da matriz. Fora da matriz, nunca aparece</td></tr>
+      <tr><td>3 · Abrir espaço no contrato</td><td class="m">core/contracts</td>
+        <td>Método <strong>opcional</strong> em ResourceCapabilities</td></tr>
+      <tr><td>4 · Implementar onde existe</td><td class="m">capabilities.ts do resource</td>
+        <td>Só nos resources que suportam</td></tr>
+    </tbody>
+  </table></div>
+  <pre class="tree"><i>// Exemplo: acrescentar "duplicate"</i>
+
+<i>// 1. core/contracts/actions.ts</i>
+export type ActionKey = 'save' | 'saveAndBuild' | <i>/* ... */</i> | <b>'duplicate'</b>
+
+<i>// 2. versioning/machine.ts — em quais estados faz sentido duplicar</i>
+ready:  ['newVersionFrom', 'archive', 'remove', 'promote', <b>'duplicate'</b>],
+active: ['newVersionFrom', 'archive', 'remove', 'promote', 'rollback', <b>'duplicate'</b>],
+
+<i>// 3. core/contracts/capabilities.ts</i>
+<b>duplicate?</b>(): Promise&lt;{ id: Id }&gt;
+
+<i>// 4. resources/applications/capabilities.ts — so onde existe</i>
+duplicate: () =&gt; svc.duplicate(resourceRef.versionId)
+
+<i>// Firewall nao implementa: o botao nunca aparece para Firewall.</i>
+<i>// Nenhuma Shell foi alterada.</i></pre>
+  <div class="grid g2">
+    <div class="note"><span class="lb">O que NÃO se toca</span>
+      <p>As Shells (leem a matriz, não enumeram ações), o ShellResolver e o resolveMode (decidem
+        modo, não ações), os outros resources, as rotas e o middleware.</p></div>
+    <div class="note g"><span class="lb">O que garante que ninguém contorne a matriz</span>
+      <p>Um teste de enumeração: para cada estado e cada resource, comparar o conjunto resolvido com
+        o esperado. Como o cruzamento é função pura, não monta componente nem simula API — e falha
+        no CI se alguém acrescentar condicional dentro de uma Shell.</p></div>
+  </div>
+
+  <h3>Na fundação: a presença do método é o registro</h3>
+  <pre class="tree"><i>// O opcional (?) declara: este resource pode nao implementar esta acao.</i>
+export interface ResourceCapabilities {
+  save(): Promise&lt;void&gt;
+  build?(): Promise&lt;Job&gt;
+  cancelBuild?(): Promise&lt;void&gt;
+  newVersionFrom?(): Promise&lt;{ id: Id }&gt;
+  archive?(comment: string): Promise&lt;Job&gt;
+}
+
+<i>// O cruzamento, agora verificavel em compilacao:</i>
+<i>// o estado permite  E  o resource implementa.</i>
+export const availableActions = (state: State, caps: ResourceCapabilities) =&gt;
+  allowedActions(state).filter((a) =&gt; typeof caps[a] === 'function')</pre>
+  <div class="grid g2">
+    <div class="note g"><span class="lb">Por que é mais forte</span>
+      <p>Com nomes soltos, um comando renomeado só falha quando o usuário clica. Com métodos, o
+        compilador recusa antes do build. O comportamento na tela é o mesmo; muda quando o erro
+        é descoberto.</p></div>
+    <div class="note"><span class="lb">O que não muda</span>
+      <p>O cruzamento continua sendo falha fechada: estado desconhecido produz lista vazia de
+        ações, nunca a lista completa. É a decisão do Console atual que mais vale preservar.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ 11 -->
+<section id="s11">
+  <h2><span class="n">11</span> Exemplos de implementação</h2>
+  <p>As seções anteriores descrevem contratos. Esta mostra o que efetivamente se escreve para pôr
+    um resource no ar — e o que <strong>não</strong> se escreve. Três exemplos, cada um provando
+    uma coisa diferente.</p>
+
+  <h3>A composição do Console atual, que é o ponto de partida</h3>
+  <p>O Console atual já resolveu a parte difícil: um scaffold genérico recebe o componente fino do
+    resource e a lista de abas <strong>como dados</strong>, e a Shell nunca importa nada de resource.
+    Esta seção parte dessa estrutura; o que muda está marcado.</p>
+  <pre class="tree"><b>VersionEditorTabsShell</b>            <i>generico, em templates/version-shell-block/</i>
+  props: <b>adapter</b>, <b>tabs[]</b>, useVersionQuery, resource, resourceType, bare
+  │
+  └── <b>VersionShell</b>                  <i>generico: estado, acoes, contexto, overlay</i>
+      │
+      └── &lt;component :is="<b>adapter</b>"&gt;   <i>o fino do resource, ENTRA POR PROP</i>
+          │
+          └── TabView               <i>dirigido por tabs[], ENTRA POR PROP</i></pre>
+  <div class="grid g2">
+    <div class="note g"><span class="lb">Por que isso já está certo</span>
+      <p>O específico do resource entra como <strong>dado</strong>, não como import. É por isso que
+        a Shell não conhece resource: ela nunca importa nada dele. A prop <code>bare</code> já cobre
+        o resource sem abas.</p></div>
+    <div class="note r"><span class="lb">Correção de rota deste documento</span>
+      <p>Versões anteriores desta seção propunham artefatos que <strong>não existem</strong> no
+        Console atual — Form e Fields como componentes separados, capabilities e support como
+        arquivos próprios. Era invenção, e foi removido.</p></div>
+  </div>
+
+  <h3>O que muda para atender as duas Shells — uma linha</h3>
+  <pre class="tree"><i>// HOJE</i>
+&lt;VersionShell :use-version-query="useVersionQuery" :resource-id="resourceId" ...&gt;
+  &lt;component :is="adapter" :resource="resource" :version-id="versionId"&gt;
+
+<i>// PROPOSTO</i>
+&lt;component :is="<b>shellFor(mode)</b>" :mode="mode" :resource-ref="resourceRef" ...&gt;
+  &lt;component :is="adapter" :resource="resource" <b>:mode="mode" :resource-ref="resourceRef"</b>&gt;</pre>
+  <p>Intenção: a DefaultShell entra como <strong>irmã</strong> da VersionShell, satisfazendo a mesma
+    interface. O adapter e as abas funcionam nas duas sem alteração, porque já não conhecem a Shell
+    que os envolve.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Peça genérica</th><th>Hoje</th><th>Proposto</th><th>Marcação</th></tr></thead>
+    <tbody>
+      <tr><td>scaffold</td><td class="m">VersionEditorTabsShell</td><td class="m">ResourceShellScaffold</td><td>RENOMEADO</td></tr>
+      <tr><td>casca versionada</td><td class="m">VersionShell</td><td class="m">VersionShell</td><td>MANTIDO</td></tr>
+      <tr><td>casca direta</td><td>não existe — bloco de formulário legado</td><td class="m">DefaultShell</td><td>NOVO</td></tr>
+      <tr><td>chrome da tela</td><td class="m">VersionEditScreen</td><td class="m">ResourceEditScreen</td><td>RENOMEADO</td></tr>
+      <tr><td>matriz de estados</td><td class="m">version-machine.js</td><td>igual + máquina trivial do modo default</td><td>MANTIDO</td></tr>
+      <tr><td>listagem de versões</td><td class="m">VersionListDataView</td><td>igual</td><td>MANTIDO</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Application, na estrutura do Console atual</h3>
+  <pre class="tree"><u>app/resources/applications/</u>
+├── application-service.ts        <i>estende a classe base; URL por geracao</i>   <b>MANTIDO</b>
+├── application-transform.ts      <i>transformadores puros de payload</i>          <b>RENOMEADO</b>
+├── ApplicationAdapter.vue        <i>useForm + capacidades. Template: &lt;slot&gt;</i>  <b>RENOMEADO</b>
+├── ApplicationEditorTabs.vue     <i>fornece adapter e tabs[] ao scaffold</i>      <b>MANTIDO</b>
+└── FormFieldsApplication.vue     <i>os campos</i>                                 <b>MANTIDO</b>
+
+<b>app/core/</b>          <i>NAO MUDA ao acrescentar um resource</i>
+<b>app/versioning/</b>    <i>NAO MUDA ao acrescentar um resource</i></pre>
+  <div class="tw"><table>
+    <thead><tr><th>Artefato</th><th>Origem do nome</th><th>Marcação e motivo</th></tr></thead>
+    <tbody>
+      <tr><td class="m">application-service.ts</td><td class="m">edge-app-version-service.js</td>
+        <td><b>MANTIDO.</b> Perde o infixo <code>version</code> porque serve os dois modos</td></tr>
+      <tr><td class="m">application-transform.ts</td><td class="m">edge-app-version-adapter.js</td>
+        <td><b>RENOMEADO.</b> Hoje <code>adapter</code> nomeia duas coisas — o transformador de
+          payload e o componente fino. Dar dono único à palavra elimina uma colisão existente</td></tr>
+      <tr><td class="m">ApplicationAdapter.vue</td><td class="m">ApplicationVersionAdapter.vue</td>
+        <td><b>RENOMEADO.</b> Perde <code>version</code>; continua com 25 linhas e template só slot</td></tr>
+      <tr><td class="m">ApplicationEditorTabs.vue</td><td class="m">VersionEditorTabs.vue</td>
+        <td><b>MANTIDO</b> em forma e papel</td></tr>
+      <tr><td class="m">FormFieldsApplication.vue</td><td class="m">FormFieldsEditEdgeApplications.vue</td>
+        <td><b>MANTIDO.</b> A convenção <code>FormFields</code> existe em 62 arquivos; não se cria
+          uma segunda</td></tr>
+    </tbody>
+  </table></div>
+  <pre class="tree"><i>// ApplicationAdapter.vue — o fino, como ja e hoje</i>
+useResourceFormAdapter({
+  resource: () =&gt; props.resource,
+  <b>target</b>: () =&gt; props.mode,          <i>// em vez de resourceId + versionId</i>
+  service: applicationService,
+  validationSchema: yup.object({ name: yup.string().required() })
+})
+
+<i>// &lt;template&gt;&lt;slot /&gt;&lt;/template&gt;   — nao renderiza nada</i>
+
+<i>// ApplicationEditorTabs.vue — as abas sao DADOS</i>
+const facades = useBoundFacades(props.mode, props.resourceRef)      <i>// sub-recursos ligados ao modo</i>
+
+const tabs = computed(() =&gt; [
+  { label: 'Main Settings',  component: FormFieldsApplication },
+  { label: 'Cache Settings', component: CacheSettingsListView, props: { service: facades.cache } },
+  { label: 'Rules Engine',   component: RulesEngineListView,   props: { service: facades.rules } }
+])
+
+<i>// &lt;ResourceShellScaffold :target :adapter="ApplicationAdapter" :tabs /&gt;</i></pre>
+  <div class="grid g2">
+    <div class="note g"><span class="lb">As abas são uma prop, não código dentro do scaffold</span>
+      <p>O scaffold recebe o array de abas numa prop, itera e monta o que vier. Não sabe quantas abas
+        existem, quais componentes carregam, nem se há sub-recursos. Application passa quatro
+        entradas; Network List passa uma. <strong>O código do scaffold é o mesmo nos dois casos.</strong>
+        A consequência: acrescentar um resource não altera nenhum arquivo de <code>app/core</code> —
+        e o Console atual já tem um teste que falha se isso acontecer.</p></div>
+    <div class="note"><span class="lb">Resource sem abas — nenhum artefato novo</span>
+      <p>O scaffold já tem a prop <code>bare</code>. O resource passa uma única entrada de aba.
+        Criar uma segunda forma de montar a tela repetiria o problema das duas landings que a
+        seção 07 aponta.</p></div>
+  </div>
+
+  <h3>Firewall — a prova de que é cópia</h3>
+  <p>Firewall é estruturalmente idêntico a Application: três gerações, versionado em v6, deployável.
+    A ausência de diferença é o <strong>resultado esperado</strong>: o padrão só está pronto
+    quando acrescentar um resource não exige decidir nada de novo.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Arquivo</th><th>O que muda em relação a Application</th></tr></thead>
+    <tbody>
+      <tr><td class="m">application-service.ts</td><td>A URL base de cada geração</td></tr>
+      <tr><td class="m">application-transform.ts</td><td>O mapeamento de payload do domínio</td></tr>
+      <tr><td class="m">Adapter.vue</td><td>O service e o schema. 25 linhas iguais</td></tr>
+      <tr><td class="m">EditorTabs.vue</td><td>Quais abas e sub-recursos, se houver</td></tr>
+      
+      <tr><td class="m">FormFields.vue</td><td>Os campos e o layout</td></tr>
+    </tbody>
+  </table></div>
+  <pre class="tree"><i>// app/resources/firewalls/api.ts — a unica diferenca real</i>
+const adapter = createResourceAdapter&lt;FirewallDto, Firewall&gt;({
+  toEntity:  (dto) =&gt; ({ id: dto.id, name: dto.name, domains: dto.domains ?? [] }),
+  toPayload: (m)   =&gt; ({ name: m.name, domains: m.domains })
+})
+
+export const firewallApi = {
+  v3: { base: 'v3/edge_firewall',       adapter },
+  v4: { base: 'v4/workspace/firewalls', adapter },
+  v6: { base: 'v4/workspace/firewalls', adapter }
+} satisfies Record&lt;ConfigurationModel, ApiBinding&lt;Firewall&gt;&gt;
+
+<i>// capabilities.ts — identico ao de Application, trocando so o tipo.</i>
+<i>// O service chega pronto: nao ha instanciacao nem escolha de geracao aqui.</i>
+export const firewallCapabilities = (
+  mode: ShellMode, ref: ResourceRef, svc: ResourceService&lt;Firewall&gt;, form: FormHandles
+): ResourceCapabilities =&gt; { <i>/* mesma estrutura, linha por linha */</i> }</pre>
+  <div class="note g"><span class="lb">O teste do padrão</span>
+    <p>Firewall não altera nenhuma linha de <code>app/core</code> nem de <code>app/versioning</code>.
+      É isso que o lint de fronteira garante no CI: se acrescentar um resource exigir mexer em
+      código compartilhado, o build quebra.</p></div>
+
+  <h3>Network List — a única forma suportada de divergir</h3>
+  <p>Nem todo resource versionado é deployável. No Console atual, Function, Network List e WAF são
+    versionados mas <strong>não têm deploy, promote nem rollback</strong> — e essa divergência é
+    declarada por configuração, sem bifurcar a Shell. Aqui, ela é declarada pela ausência dos
+    métodos.</p>
+  <pre class="tree">  return {
+    save:           () =&gt; svc.saveDraft(form()),
+    build:          () =&gt; svc.build(),
+    cancelBuild:    () =&gt; svc.cancelBuild(),
+    newVersionFrom: () =&gt; svc.createVersion({ from: resourceRef.versionId }),
+    archive:  (c)   =&gt; svc.archive({ comment: c }),
+    remove:         () =&gt; svc.remove(resourceRef.versionId)
+    <i>// Sem promote. Sem rollback. Nao existem para este resource.</i>
+  }</pre>
+  <div class="tw"><table>
+    <thead><tr><th>Superfície</th><th>Application</th><th>Network List</th><th>Como a diferença é obtida</th></tr></thead>
+    <tbody>
+      <tr><td>Botão Deploy no header</td><td>aparece</td><td>não aparece</td><td class="m">promote ausente</td></tr>
+      <tr><td>Rollback no menu da versão</td><td>aparece</td><td>não aparece</td><td class="m">rollback ausente</td></tr>
+      <tr><td>Save, build, archive</td><td>aparecem</td><td>aparecem</td><td>métodos presentes nos dois</td></tr>
+      <tr><td>Código de Shell alterado</td><td>nenhum</td><td>nenhum</td><td>a VersionShell não sabe a diferença</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note g"><span class="lb">A ausência é a declaração — e é verificável</span>
+    <p>A VersionShell cruza o que o estado permite com o que o resource implementa. Se
+      <code>promote</code> não existe, o botão não é renderizado: sem condicional, sem flag, sem
+      entrada de configuração. E um teste que enumere estado × resource cobre isso <strong>sem
+      montar tela</strong>, porque o cruzamento é função pura.</p></div>
+
+  <h3>O rastro completo: do flag ao editor</h3>
+  <pre class="tree"><i>// 1 — o flag, avaliado uma vez no bootstrap. O unico arquivo que le flag.</i>
+const details = client.getStringDetails('configuration-model', 'v3')
+appContext.model = details.value as ConfigurationModel        <i>// 'v3' | 'v4' | 'v6'</i>
+
+<i>// 2 — resolveMode: funcao pura, devolve modo E motivo</i>
+export const <b>resolveMode</b> = (ctx, support, params) =&gt; {
+  if (!params.id)                                 return { mode: 'create',
+                                                            reason: 'creating' }
+  if (!support.versionedIn.includes(ctx.model))    return { mode: 'default',
+                                                            reason: 'model-unsupported' }
+  if (!ctx.session.permissions.can('resource:versioning:read'))
+                                                  return { mode: 'default',
+                                                            reason: 'permission-denied' }
+  return { mode: 'versioned', reason: 'versioning-enabled' }
+}
+
+<i>// 3 — ShellResolver aplica o resultado. A Shell e DERIVADA do tipo do modo.</i>
+const { target, reason } = resolveMode(useAppContext(), supportOf(resource), route.params)
+const shell = computed(() =&gt; <b>shellFor</b>(mode))
+track('shell.resolved', { resource, mode, reason })</pre>
+
+  <div class="tw"><table>
+    <thead><tr><th>Etapa</th><th>Quem decide</th><th>Resultado</th><th>Quantas vezes</th></tr></thead>
+    <tbody>
+      <tr><td>Avaliar o flag</td><td>provider OpenFeature</td><td class="m">model: v3 | v4 | v6</td><td>uma vez, no bootstrap</td></tr>
+      <tr><td>Compor o contexto</td><td>AppShell</td><td class="m">AppContext</td><td>refeito na troca de conta</td></tr>
+      <tr><td>Resolver o modo</td><td class="m">resolveMode()</td><td class="m">ShellMode + motivo</td><td>a cada abertura de resource</td></tr>
+      <tr><td>Montar a Shell</td><td class="m">ShellResolver</td><td>DefaultShell ou VersionShell</td><td>derivado, sem nova decisão</td></tr>
+      <tr><td>Compor as ações</td><td>a Shell</td><td>estado ∩ capacidades</td><td>a cada mudança de estado</td></tr>
+      <tr><td>Renderizar o editor</td><td>o resource</td><td>o mesmo nos três modos</td><td>agnóstico do modo</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="grid g2">
+    <div class="note r"><span class="lb">Onde a feature flag é lida</span>
+      <p>Em <strong>um único arquivo</strong>: o provider, no bootstrap. Nem resolveMode, nem
+        ShellResolver, nem as Shells, nem os services, nem as capacidades, nem os editores. No
+        Console atual a mesma flag é lida por quatro padrões, com duas fontes de verdade.</p></div>
+    <div class="note"><span class="lb">O motivo vai para a telemetria</span>
+      <p>Permite responder “por que este cliente viu a tela default?” sem reproduzir o estado da
+        conta: <code>creating</code>, <code>model-unsupported</code>,
+        <code>permission-denied</code> ou <code>versioning-enabled</code>.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ 12 -->
+<section id="s10b">
+  <h2><span class="n">12</span> Decisões em aberto</h2>
+  <p>Registradas aqui para não serem resolvidas por omissão.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Decisão</th><th>Impacto</th><th>Bloqueia</th></tr></thead>
+    <tbody>
+      <tr><td>Quando o catálogo do design system é consultado</td>
+        <td>Este documento assume <b>autoria</b>: consultado ao escrever o código. Se a aplicação
+          também consultar em runtime, o MCP passa a ser dependência de execução e entra na Figura 1
+          com política de cache</td>
+        <td>Figura 1, skills, dependências da fundação</td></tr>
+      <tr><td>Adotar <code>bff-session</code> e quando</td>
+        <td>Resolve o HttpOnly de imediato, mas exige rota de servidor publicada e abre mão de
+          stateless. O modo <code>hybrid</code> funciona sem isso</td>
+        <td>server/api/auth, guard de rota</td></tr>
+      <tr><td>Nome do eixo de versão</td>
+        <td>Os endpoints ficam sob o mesmo caminho de API, o que sugere modelo de configuração
+          em vez de versão de API</td>
+        <td>contracts, adapters</td></tr>
+      <tr><td>Extensões fora do CRUD</td>
+        <td>Reordenar, mover de fase e publicar em lote não cabem na fachada de cinco métodos e
+          precisam de extensão declarada</td>
+        <td>contratos de sub-recurso</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  <b>Console Nuxt</b> · spec console-nuxt-foundation — 72 critérios de aceitação,
+  12 decisões registradas, 12 invariantes verificadas por teste automatizado<br>
+  <b>Insumos</b> análise do azion-console-kit em três frentes, documento de Arquitetura de
+  Shells, webkit v4.2.1 e VERSION-SHELL.md
+</footer>
+
+</div></body></html>
